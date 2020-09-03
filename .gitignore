@@ -4,3 +4,4 @@ build/autogen
 *~
 solutions.zip
 *.c-student
+.project
