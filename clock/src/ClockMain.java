@@ -9,9 +9,9 @@ import clock.io.ClockOutput;
 
 public class ClockMain {
 
-  int CHOICE_SET_TIME = 1; // user set new clock time
-  int CHOICE_SET_ALARM = 2; // user set new alarm time
-  int CHOICE_TOGGLE_ALARM = 3; // user pressed both buttons simultaneously
+  static final int CHOICE_SET_TIME = 1; // user set new clock time
+  static final int CHOICE_SET_ALARM = 2; // user set new alarm time
+  static final int CHOICE_TOGGLE_ALARM = 3; // user pressed both buttons simultaneously
 
   public static void main(String[] args) throws InterruptedException {
     AlarmClockEmulator emulator = new AlarmClockEmulator();
@@ -38,7 +38,23 @@ public class ClockMain {
       int m = userInput.getMinutes();
       int s = userInput.getSeconds();
 
-      System.out.println("choice=" + choice + " h=" + h + " m=" + m + " s=" + s);
+      switch (choice) {
+        case CHOICE_SET_TIME:
+          state.setClockTime(h, m, s);
+          state.unplingAlarm();
+          break;
+        case CHOICE_SET_ALARM:
+          state.setAlarmTime(h, m, s);
+          state.unplingAlarm();
+          break;
+        case CHOICE_TOGGLE_ALARM:
+          state.toggleAlarm();
+          break;
+        default:
+          break;
+      }
+
+      // System.out.println("choice=" + choice + " h=" + h + " m=" + m + " s=" + s);
     }
   }
 }

@@ -50,6 +50,14 @@ public class TimeData {
     mutex.unlock();
   }
 
+  public void setTime(int hours, int minutes, int seconds) {
+    mutex.lock();
+    this.hours = hours;
+    this.minutes = minutes;
+    this.seconds = seconds;
+    mutex.unlock();
+  }
+
   public int getHours() {
     mutex.lock();
     int hoursReturn = hours;
@@ -71,18 +79,4 @@ public class TimeData {
     return secondsReturn;
   }
 
-  @Override
-  public boolean equals(Object other) {
-    if (!(other instanceof TimeData)) {
-      return false;
-    }
-    TimeData otherData = (TimeData) other;
-    mutex.lock();
-    otherData.mutex.lock();
-    boolean result = this.hours == otherData.hours && this.minutes == otherData.minutes
-        && this.seconds == otherData.seconds;
-    mutex.unlock();
-    otherData.mutex.unlock();
-    return result;
-  }
 }
