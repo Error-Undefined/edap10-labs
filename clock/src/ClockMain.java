@@ -19,12 +19,13 @@ public class ClockMain {
     ClockInput in = emulator.getInput();
     ClockOutput out = emulator.getOutput();
 
-    ClockState state = new ClockState(in, out);
+    ClockState state = new ClockState(out);
 
     Thread update = new UpdateThread(state);
+    update.setName("UpdateThread");
     update.start();
 
-    // out.displayTime(23, 59, 51); // arbitrary time: just an example
+    out.displayTime(10, 49, 51); // arbitrary time: just an example
 
     Semaphore hardwareInterrupt = in.getSemaphore();
 
@@ -41,11 +42,9 @@ public class ClockMain {
       switch (choice) {
         case CHOICE_SET_TIME:
           state.setClockTime(h, m, s);
-          state.unplingAlarm();
           break;
         case CHOICE_SET_ALARM:
           state.setAlarmTime(h, m, s);
-          state.unplingAlarm();
           break;
         case CHOICE_TOGGLE_ALARM:
           state.toggleAlarm();

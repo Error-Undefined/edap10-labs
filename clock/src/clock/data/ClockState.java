@@ -3,7 +3,6 @@ package clock.data;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import clock.io.ClockInput;
 import clock.io.ClockOutput;
 
 public class ClockState {
@@ -14,23 +13,20 @@ public class ClockState {
 
   private int alarmState;
 
-  private ClockInput input;
   private ClockOutput output;
 
   private static final int ALARM_OFF = 0;
   private static final int ALARM_ARMED = 1;
-  private static final int ALARM_RINGING = 2;
 
-  public ClockState(ClockInput in, ClockOutput out) {
+  public ClockState(ClockOutput out) {
     stateMutex = new ReentrantLock();
 
     clockTime = new TimeData();
     alarmTime = new TimeData();
 
-    this.input = in;
     this.output = out;
 
-    alarmState = 0;
+    alarmState = ALARM_OFF;
   }
 
   public void tickForward() {
@@ -62,7 +58,7 @@ public class ClockState {
 
   public TimeStruct getAlarmTime() {
     stateMutex.lock();
-    TimeStruct t = new TimeStruct(clockTime.getHours(), clockTime.getMinutes(), clockTime.getSeconds());
+    TimeStruct t = new TimeStruct(alarmTime.getHours(), alarmTime.getMinutes(), alarmTime.getSeconds());
     stateMutex.unlock();
     return t;
   }
@@ -84,18 +80,11 @@ public class ClockState {
    */
   public void plingAlarm() {
     stateMutex.lock();
-    if (alarmState == ALARM_OFF) {
+    if (alarmState != ALARM_ARMED) {
       stateMutex.unlock();
       return;
     }
     output.alarm();
-    stateMutex.unlock();
-  }
-
-  public void unplingAlarm() {
-    stateMutex.lock();
-    alarmState = ALARM_OFF;
-    output.setAlarmIndicator(false);
     stateMutex.unlock();
   }
 

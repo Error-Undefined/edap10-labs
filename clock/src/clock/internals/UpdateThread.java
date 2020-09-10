@@ -1,7 +1,5 @@
 package clock.internals;
 
-import java.sql.Time;
-
 import clock.data.ClockState;
 import clock.data.TimeStruct;
 
@@ -26,9 +24,11 @@ public class UpdateThread extends Thread {
 
       if (alarmTime.equals(clockTime) && state.isAlarmArmed()) {
         shouldPling = 20;
+      } else if (!state.isAlarmArmed()) {
+        shouldPling = 0;
       }
 
-      if (shouldPling > 0) {
+      if (shouldPling > 0 && state.isAlarmArmed()) {
         shouldPling--;
         state.plingAlarm();
       }
