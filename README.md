@@ -1,0 +1,1 @@
+Repository for labs in the course EDAP10 concurrent programming at the department of Computer Science, Faculty of Engineering at Lund University
