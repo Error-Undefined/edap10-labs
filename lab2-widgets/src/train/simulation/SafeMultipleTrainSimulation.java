@@ -9,7 +9,7 @@ public class SafeMultipleTrainSimulation {
   public static void main(String[] args) {
 
     TrainView view = new TrainView();
-    TamperedSegmentMonitor monitor = new TamperedSegmentMonitor();
+    SegmentMonitor monitor = new SegmentMonitor();
     // SegmentMonitor monitor = new SegmentMonitor();
 
     for (int i = 0; i < 20; i++) {

@@ -10,10 +10,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class SafeRouteThread extends Thread {
-  private TamperedSegmentMonitor monitor;
+  private SegmentMonitor monitor;
   private TrainView view;
 
-  public SafeRouteThread(TamperedSegmentMonitor monitor, TrainView view) {
+  public SafeRouteThread(SegmentMonitor monitor, TrainView view) {
     this.monitor = monitor;
     this.view = view;
   }

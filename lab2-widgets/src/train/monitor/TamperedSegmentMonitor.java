@@ -12,7 +12,7 @@ public class TamperedSegmentMonitor {
     while (busySegments.contains(s)) {
       try {
         wait();
-      } catch (InterruptedException e) {
+      } catch (Exception e) {
         e.printStackTrace();
         throw new Error(e);
       }
