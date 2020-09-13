@@ -13,6 +13,8 @@ public class SafeRouteThread extends Thread {
   private SegmentMonitor monitor;
   private TrainView view;
 
+  private static final int TRAIN_LENGTH = 3;
+
   public SafeRouteThread(SegmentMonitor monitor, TrainView view) {
     this.monitor = monitor;
     this.view = view;
@@ -23,7 +25,7 @@ public class SafeRouteThread extends Thread {
 
     Queue<Segment> bq = new LinkedList<>();
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < TRAIN_LENGTH; i++) {
       Segment s = route.next();
       bq.add(s);
       monitor.getSegmentPermit(s);
