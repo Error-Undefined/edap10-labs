@@ -3,16 +3,17 @@ package train.threads;
 import train.model.Route;
 import train.model.Segment;
 import train.monitor.SegmentMonitor;
+import train.monitor.TamperedSegmentMonitor;
 import train.view.TrainView;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class SafeRouteThread extends Thread {
-  private SegmentMonitor monitor;
+  private TamperedSegmentMonitor monitor;
   private TrainView view;
 
-  public SafeRouteThread(SegmentMonitor monitor, TrainView view) {
+  public SafeRouteThread(TamperedSegmentMonitor monitor, TrainView view) {
     this.monitor = monitor;
     this.view = view;
   }
