@@ -8,4 +8,8 @@ public class PassengerThread extends Thread {
   public PassengerThread(Passenger passenger) {
     this.passenger = passenger;
   }
+
+  public void run() {
+
+  }
 }
