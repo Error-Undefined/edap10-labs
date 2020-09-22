@@ -1,7 +1,6 @@
 package thread;
 
 import lift.LiftView;
-import lift.Passenger;
 import monitor.Floors;
 import monitor.LiftMonitor;
 

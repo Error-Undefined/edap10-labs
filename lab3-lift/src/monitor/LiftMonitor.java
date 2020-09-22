@@ -47,7 +47,8 @@ public class LiftMonitor {
     totalWaiting++;
     notifyAll();
 
-    int passengerDirection = Math.abs(waitFloor - endFloor) / (waitFloor - endFloor);
+    // int passengerDirection = Math.abs(waitFloor - endFloor) / (waitFloor -
+    // endFloor);
 
     while (passengersInside == MAX_PASSENGERS || floor != waitFloor || inMotion
         || hasEnteredAtFloor == willEnterAtFloor) {
