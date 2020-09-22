@@ -2,6 +2,8 @@ import java.awt.event.ActionEvent;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -25,6 +27,8 @@ public class CodeBreaker implements SnifferCallback {
 
   private final ExecutorService pool;
 
+  private final Lock reportMutex;
+
   // -----------------------------------------------------------------------
 
   private CodeBreaker() {
@@ -35,6 +39,8 @@ public class CodeBreaker implements SnifferCallback {
     mainProgressBar = w.getProgressBar();
 
     pool = Executors.newFixedThreadPool(2);
+
+    reportMutex = new ReentrantLock();
 
   }
 
@@ -80,7 +86,7 @@ public class CodeBreaker implements SnifferCallback {
         progressReport.onComplete(decrypted);
         // On completion, add a "remove" button
         JButton removeButton = new JButton("Remove");
-        removeButton.addActionListener((e) -> onRemoveButtonClick(progressItem));
+        removeButton.addActionListener((e) -> onRemoveButtonClick(progressItem, progressReport));
         progressItem.add(removeButton);
 
       } catch (InterruptedException e) {
@@ -89,8 +95,9 @@ public class CodeBreaker implements SnifferCallback {
     });
   }
 
-  private void onRemoveButtonClick(ProgressItem item) {
+  private void onRemoveButtonClick(ProgressItem item, ProgressReport progressReport) {
     progressList.remove(item);
+    progressReport.onRemove();
   }
 
   private class ProgressReport {
@@ -100,13 +107,17 @@ public class CodeBreaker implements SnifferCallback {
     public ProgressReport(ProgressItem item) {
       this.item = item;
       totalProgress = 0;
+      reportMutex.lock();
       mainProgressBar.setMaximum(mainProgressBar.getMaximum() + 1000000);
+      reportMutex.unlock();
     }
 
     public void onProgress(int ppmDelta) {
       totalProgress += ppmDelta;
+      reportMutex.lock();
       item.getProgressBar().setValue(totalProgress);
       mainProgressBar.setValue(mainProgressBar.getValue() + ppmDelta);
+      reportMutex.unlock();
       // System.out.println("Progress: " + totalProgress + "/1000000");
     }
 
@@ -114,5 +125,11 @@ public class CodeBreaker implements SnifferCallback {
       item.getTextArea().setText(decrypted);
     }
 
+    public void onRemove() {
+      reportMutex.lock();
+      mainProgressBar.setValue(mainProgressBar.getValue() - 1000000);
+      mainProgressBar.setMaximum(mainProgressBar.getMaximum() - 1000000);
+      reportMutex.unlock();
+    }
   }
 }
