@@ -26,8 +26,6 @@ public class CodeBreaker implements SnifferCallback {
 
   private final ExecutorService pool;
 
-  private final Lock reportMutex; // Needed for mutual exclusion in progress bar update
-
   // -----------------------------------------------------------------------
 
   private CodeBreaker() {
@@ -38,8 +36,6 @@ public class CodeBreaker implements SnifferCallback {
     mainProgressBar = w.getProgressBar();
 
     pool = Executors.newFixedThreadPool(2);
-
-    reportMutex = new ReentrantLock();
 
     w.enableErrorChecks();
   }
@@ -130,21 +126,15 @@ public class CodeBreaker implements SnifferCallback {
       SwingUtilities.invokeLater(() -> {
         this.item = item;
         totalProgress = 0;
-        reportMutex.lock();
-
         mainProgressBar.setMaximum(mainProgressBar.getMaximum() + 1000000);
-
-        reportMutex.unlock();
       });
     }
 
     public void onProgress(int ppmDelta) {
       SwingUtilities.invokeLater(() -> {
         totalProgress += ppmDelta;
-        reportMutex.lock();
         item.getProgressBar().setValue(totalProgress);
         mainProgressBar.setValue(mainProgressBar.getValue() + ppmDelta);
-        reportMutex.unlock();
         // System.out.println("Progress: " + totalProgress + "/1000000");
       });
     }
@@ -157,10 +147,8 @@ public class CodeBreaker implements SnifferCallback {
 
     public void onRemove() {
       SwingUtilities.invokeLater(() -> {
-        reportMutex.lock();
         mainProgressBar.setValue(mainProgressBar.getValue() - 1000000);
         mainProgressBar.setMaximum(mainProgressBar.getMaximum() - 1000000);
-        reportMutex.unlock();
       });
     }
 
@@ -169,9 +157,7 @@ public class CodeBreaker implements SnifferCallback {
         item.getTextArea().setText("Cancelled");
         item.getProgressBar().setValue(1000000);
         int toAdd = 1000000 - totalProgress;
-        reportMutex.lock();
         mainProgressBar.setValue(mainProgressBar.getValue() + toAdd);
-        reportMutex.unlock();
       });
     }
   }
