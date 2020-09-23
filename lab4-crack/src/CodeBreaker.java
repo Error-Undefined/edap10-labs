@@ -1,7 +1,7 @@
-import java.awt.event.ActionEvent;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -27,7 +27,7 @@ public class CodeBreaker implements SnifferCallback {
 
   private final ExecutorService pool;
 
-  private final Lock reportMutex;
+  private final Lock reportMutex; // Needed for mutual exclusion in progress bar update
 
   // -----------------------------------------------------------------------
 
@@ -42,6 +42,7 @@ public class CodeBreaker implements SnifferCallback {
 
     reportMutex = new ReentrantLock();
 
+    w.enableErrorChecks();
   }
 
   // -----------------------------------------------------------------------
@@ -66,32 +67,45 @@ public class CodeBreaker implements SnifferCallback {
   /** Called by a Sniffer thread when an encrypted message is obtained. */
   @Override
   public void onMessageIntercepted(String message, BigInteger n) {
-    // System.out.println("message intercepted (N=" + n + ")...");
-    WorklistItem workListItem = new WorklistItem(n, message);
-    JButton itemButton = new JButton("Break");
-    itemButton.addActionListener((e) -> onBreakButtonClick(workListItem, itemButton, message, n));
-    workListItem.add(itemButton);
-    workList.add(workListItem);
+
+    SwingUtilities.invokeLater(() -> {
+      JButton itemButton = new JButton("Break");
+      WorklistItem workListItem = new WorklistItem(n, message);
+      // System.out.println("message intercepted (N=" + n + ")...");
+      workListItem.add(itemButton);
+      workList.add(workListItem);
+      itemButton.addActionListener((e) -> onBreakButtonClick(workListItem, message, n));
+    });
   }
 
-  private void onBreakButtonClick(WorklistItem workListItem, JButton button, String message, BigInteger n) {
-    workList.remove(workListItem);
-    ProgressItem progressItem = new ProgressItem(n, message);
-    progressList.add(progressItem);
+  private void onBreakButtonClick(WorklistItem workListItem, String message, BigInteger n) {
+    SwingUtilities.invokeLater(() -> {
+      workList.remove(workListItem);
+      ProgressItem progressItem = new ProgressItem(n, message);
+      progressList.add(progressItem);
+      ProgressReport progressReport = new ProgressReport(progressItem);
 
-    pool.execute(() -> {
-      try {
-        ProgressReport progressReport = new ProgressReport(progressItem);
-        String decrypted = Factorizer.crack(message, n, (i) -> progressReport.onProgress(i));
-        progressReport.onComplete(decrypted);
-        // On completion, add a "remove" button
-        JButton removeButton = new JButton("Remove");
-        removeButton.addActionListener((e) -> onRemoveButtonClick(progressItem, progressReport));
-        progressItem.add(removeButton);
+      JButton cancelButton = new JButton("Cancel");
 
-      } catch (InterruptedException e) {
-        throw new Error(e);
-      }
+      JButton removeButton = new JButton("Remove");
+      removeButton.addActionListener((e) -> onRemoveButtonClick(progressItem, progressReport));
+
+      Runnable crackRunnable = () -> {
+        try {
+          String decrypted = Factorizer.crack(message, n, (i) -> progressReport.onProgress(i));
+          progressReport.onComplete(decrypted);
+          // On completion, add a "remove" button
+          progressItem.remove(cancelButton);
+          progressItem.add(removeButton);
+        } catch (InterruptedException e) {
+          throw new Error(e);
+        }
+      };
+      progressItem.add(cancelButton);
+
+      Future<?> crackFuture = pool.submit(crackRunnable);
+      cancelButton.addActionListener(
+          (e) -> onCancelButtonClick(cancelButton, removeButton, progressItem, progressReport, crackFuture));
     });
   }
 
@@ -100,36 +114,66 @@ public class CodeBreaker implements SnifferCallback {
     progressReport.onRemove();
   }
 
+  private void onCancelButtonClick(JButton cancelButton, JButton removeButton, ProgressItem item,
+      ProgressReport progressReport, Future<?> crackFuture) {
+    if (crackFuture.cancel(true)) {
+      progressReport.onCancel();
+      item.remove(cancelButton);
+      item.add(removeButton);
+    }
+  }
+
   private class ProgressReport {
     private ProgressItem item;
     private int totalProgress;
 
     public ProgressReport(ProgressItem item) {
-      this.item = item;
-      totalProgress = 0;
-      reportMutex.lock();
-      mainProgressBar.setMaximum(mainProgressBar.getMaximum() + 1000000);
-      reportMutex.unlock();
+      SwingUtilities.invokeLater(() -> {
+        this.item = item;
+        totalProgress = 0;
+        reportMutex.lock();
+
+        mainProgressBar.setMaximum(mainProgressBar.getMaximum() + 1000000);
+
+        reportMutex.unlock();
+      });
     }
 
     public void onProgress(int ppmDelta) {
-      totalProgress += ppmDelta;
-      reportMutex.lock();
-      item.getProgressBar().setValue(totalProgress);
-      mainProgressBar.setValue(mainProgressBar.getValue() + ppmDelta);
-      reportMutex.unlock();
-      // System.out.println("Progress: " + totalProgress + "/1000000");
+      SwingUtilities.invokeLater(() -> {
+        totalProgress += ppmDelta;
+        reportMutex.lock();
+        item.getProgressBar().setValue(totalProgress);
+        mainProgressBar.setValue(mainProgressBar.getValue() + ppmDelta);
+        reportMutex.unlock();
+        // System.out.println("Progress: " + totalProgress + "/1000000");
+      });
     }
 
     public void onComplete(String decrypted) {
-      item.getTextArea().setText(decrypted);
+      SwingUtilities.invokeLater(() -> {
+        item.getTextArea().setText(decrypted);
+      });
     }
 
     public void onRemove() {
-      reportMutex.lock();
-      mainProgressBar.setValue(mainProgressBar.getValue() - 1000000);
-      mainProgressBar.setMaximum(mainProgressBar.getMaximum() - 1000000);
-      reportMutex.unlock();
+      SwingUtilities.invokeLater(() -> {
+        reportMutex.lock();
+        mainProgressBar.setValue(mainProgressBar.getValue() - 1000000);
+        mainProgressBar.setMaximum(mainProgressBar.getMaximum() - 1000000);
+        reportMutex.unlock();
+      });
+    }
+
+    public void onCancel() {
+      SwingUtilities.invokeLater(() -> {
+        item.getTextArea().setText("Cancelled");
+        item.getProgressBar().setValue(1000000);
+        int toAdd = 1000000 - totalProgress;
+        reportMutex.lock();
+        mainProgressBar.setValue(mainProgressBar.getValue() + toAdd);
+        reportMutex.unlock();
+      });
     }
   }
 }
