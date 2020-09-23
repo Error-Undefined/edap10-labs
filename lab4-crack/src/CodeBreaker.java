@@ -16,7 +16,6 @@ import client.view.WorklistItem;
 import network.Sniffer;
 import network.SnifferCallback;
 import rsa.Factorizer;
-import rsa.ProgressTracker;
 
 public class CodeBreaker implements SnifferCallback {
 
