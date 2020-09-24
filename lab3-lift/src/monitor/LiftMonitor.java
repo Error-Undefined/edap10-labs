@@ -47,9 +47,6 @@ public class LiftMonitor {
     totalWaiting++;
     notifyAll();
 
-    // int passengerDirection = Math.abs(waitFloor - endFloor) / (waitFloor -
-    // endFloor);
-
     while (passengersInside == MAX_PASSENGERS || floor != waitFloor || inMotion
         || hasEnteredAtFloor == willEnterAtFloor) {
       wait();
@@ -99,6 +96,7 @@ public class LiftMonitor {
 
   public synchronized Floors getFloors() throws InterruptedException {
     int nextFloor = floor + direction;
+
     Floors f = new Floors(floor, nextFloor);
     floor = nextFloor;
     if (floor == 0 || floor == 6) {
