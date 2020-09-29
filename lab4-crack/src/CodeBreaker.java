@@ -2,8 +2,6 @@ import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -74,39 +72,43 @@ public class CodeBreaker implements SnifferCallback {
   }
 
   private void onBreakButtonClick(WorklistItem workListItem, String message, BigInteger n) {
-    SwingUtilities.invokeLater(() -> {
-      workList.remove(workListItem);
-      ProgressItem progressItem = new ProgressItem(n, message);
-      progressList.add(progressItem);
-      ProgressReport progressReport = new ProgressReport(progressItem);
+    // SwingUtilities.invokeLater(() -> {
+    System.out.println("Executed from thread " + Thread.currentThread().getName());
+    workList.remove(workListItem);
+    ProgressItem progressItem = new ProgressItem(n, message);
+    progressList.add(progressItem);
+    ProgressReport progressReport = new ProgressReport(progressItem);
 
-      JButton cancelButton = new JButton("Cancel");
+    JButton cancelButton = new JButton("Cancel");
 
-      JButton removeButton = new JButton("Remove");
-      removeButton.addActionListener((e) -> onRemoveButtonClick(progressItem, progressReport));
+    JButton removeButton = new JButton("Remove");
+    removeButton.addActionListener((e) -> onRemoveButtonClick(progressItem, progressReport));
 
-      Runnable crackRunnable = () -> {
-        try {
-          String decrypted = Factorizer.crack(message, n, (i) -> progressReport.onProgress(i));
-          progressReport.onComplete(decrypted);
-          // On completion, add a "remove" button
+    Runnable crackRunnable = () -> {
+      try {
+        String decrypted = Factorizer.crack(message, n, (i) -> progressReport.onProgress(i));
+        progressReport.onComplete(decrypted);
+        // On completion, add a "remove" button
+        SwingUtilities.invokeLater(() -> {
           progressItem.remove(cancelButton);
           progressItem.add(removeButton);
-        } catch (InterruptedException e) {
-          throw new Error(e);
-        }
-      };
-      progressItem.add(cancelButton);
+        });
+      } catch (InterruptedException e) {
+        throw new Error(e);
+      }
+    };
+    progressItem.add(cancelButton);
 
-      Future<?> crackFuture = pool.submit(crackRunnable);
-      cancelButton.addActionListener(
-          (e) -> onCancelButtonClick(cancelButton, removeButton, progressItem, progressReport, crackFuture));
-    });
+    Future<?> crackFuture = pool.submit(crackRunnable);
+    cancelButton.addActionListener(
+        (e) -> onCancelButtonClick(cancelButton, removeButton, progressItem, progressReport, crackFuture));
+    // });
   }
 
   private void onRemoveButtonClick(ProgressItem item, ProgressReport progressReport) {
     progressList.remove(item);
     progressReport.onRemove();
+    System.out.println("Executed from thread " + Thread.currentThread().getName());
   }
 
   private void onCancelButtonClick(JButton cancelButton, JButton removeButton, ProgressItem item,
@@ -115,6 +117,7 @@ public class CodeBreaker implements SnifferCallback {
       progressReport.onCancel();
       item.remove(cancelButton);
       item.add(removeButton);
+      System.out.println("Executed from thread " + Thread.currentThread().getName());
     }
   }
 

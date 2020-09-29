@@ -20,9 +20,7 @@ public class PassengerThread extends Thread {
       monitor.updateAfterEnter(passenger.getStartFloor(), passenger.getDestinationFloor());
 
       monitor.getExitPermit(passenger.getDestinationFloor());
-
       passenger.exitLift();
-      // new Thread(() -> passenger.exitLift()).start();
       monitor.updateAfterExit(passenger.getDestinationFloor());
     } catch (InterruptedException e) {
       throw new Error(e);
