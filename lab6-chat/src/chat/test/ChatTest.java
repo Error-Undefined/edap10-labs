@@ -10,33 +10,47 @@ import chat.client.Twit;
 
 class ChatTest {
 
-    @BeforeEach
-    void setUp(TestInfo info) throws Exception {
-        ServerControl.restartServer(info.getDisplayName());
+  @BeforeEach
+  void setUp(TestInfo info) throws Exception {
+    ServerControl.restartServer(info.getDisplayName());
+  }
+
+  @Test
+  void testOneTwit() throws InterruptedException {
+    final int NBR_MESSAGES = 5; // number of messages from each client
+    final int MESSAGE_DELAY = 100; // maximal delay between messages
+
+    Twit t = new Twit("twit", NBR_MESSAGES, MESSAGE_DELAY);
+    t.start();
+
+    ChatLog.expect(1, NBR_MESSAGES);
+  }
+
+  @Test
+  void testTwoTwits() throws InterruptedException {
+    final int NBR_TWITS = 2; // number of clients
+    final int NBR_MESSAGES = 5; // number of messages from each client
+    final int MESSAGE_DELAY = 100; // maximal delay between messages
+
+    for (int i = 1; i <= NBR_TWITS; i++) {
+      Twit t = new Twit("twit" + i, NBR_MESSAGES, MESSAGE_DELAY);
+      t.start();
     }
 
-    @Test
-    void testOneTwit() throws InterruptedException {
-        final int NBR_MESSAGES  = 5;     // number of messages from each client
-        final int MESSAGE_DELAY = 100;   // maximal delay between messages 
+    ChatLog.expect(NBR_TWITS, NBR_TWITS * NBR_MESSAGES);
+  }
 
-        Twit t = new Twit("twit", NBR_MESSAGES, MESSAGE_DELAY);
-        t.start();
+  @Test
+  void testManyTwats() throws InterruptedException {
+    final int NBR_TWITS = 15;
+    final int NBR_MESSAGES = 300;
+    final int MESSAGE_DELAY = 0;
 
-        ChatLog.expect(1, NBR_MESSAGES);
+    for (int i = 1; i <= NBR_TWITS; i++) {
+      Twit t = new Twit("twit" + i, NBR_MESSAGES, MESSAGE_DELAY);
+      t.start();
     }
 
-    @Test
-    void testTwoTwits() throws InterruptedException {
-        final int NBR_TWITS     = 2;     // number of clients
-        final int NBR_MESSAGES  = 5;     // number of messages from each client
-        final int MESSAGE_DELAY = 100;   // maximal delay between messages 
-
-        for (int i = 1; i <= NBR_TWITS; i++) {
-            Twit t = new Twit("twit" + i, NBR_MESSAGES, MESSAGE_DELAY);
-            t.start();
-        }
-
-        ChatLog.expect(NBR_TWITS, NBR_TWITS * NBR_MESSAGES);
-    }
+    ChatLog.expect(NBR_TWITS, NBR_TWITS * NBR_MESSAGES);
+  }
 }
