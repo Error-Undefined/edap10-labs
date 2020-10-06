@@ -12,14 +12,14 @@ import wash.io.WashingIO;
  * 
  * It can be used after an emergency stop (program 0) or a power failure.
  */
-public class WashingProgram1 extends ActorThread<WashingMessage> {
+public class WashingProgram2 extends ActorThread<WashingMessage> {
 
   private WashingIO io;
   private ActorThread<WashingMessage> temp;
   private ActorThread<WashingMessage> water;
   private ActorThread<WashingMessage> spin;
 
-  public WashingProgram1(WashingIO io, ActorThread<WashingMessage> temp, ActorThread<WashingMessage> water,
+  public WashingProgram2(WashingIO io, ActorThread<WashingMessage> temp, ActorThread<WashingMessage> water,
       ActorThread<WashingMessage> spin) {
     this.io = io;
     this.temp = temp;
@@ -38,8 +38,35 @@ public class WashingProgram1 extends ActorThread<WashingMessage> {
       System.out.println("got ack of fill " + receive());
       water.send(new WashingMessage(this, WashingMessage.WATER_IDLE));
 
-      // Set temperature to 60
+      // Prewash : set temperature to 40
       temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
+      System.out.println("got ack of heat " + receive());
+
+      // Spin the barrel
+      spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
+      receive();
+      // Spin for 20 simulated minutes (one minute == 60000 milliseconds)
+      Thread.sleep(20 * 60000 / Settings.SPEEDUP);
+      // Stop spinning
+      spin.send(new WashingMessage(this, WashingMessage.SPIN_OFF));
+      receive();
+
+      // Turn off heating
+      temp.send(new WashingMessage(this, WashingMessage.TEMP_IDLE));
+      receive();
+
+      // Empty of water
+      water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
+      System.out.println("got ack of empty " + receive());
+      water.send(new WashingMessage(this, WashingMessage.WATER_IDLE));
+
+      // Fill with water
+      water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10.0));
+      System.out.println("got ack of fill " + receive());
+      water.send(new WashingMessage(this, WashingMessage.WATER_IDLE));
+
+      // Set temperature to 60
+      temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 60));
       System.out.println("got ack of heat " + receive());
 
       // Instruct SpinController to rotate barrel slowly, back and forth
@@ -115,10 +142,9 @@ public class WashingProgram1 extends ActorThread<WashingMessage> {
 
       // If we end up here, it means the program was interrupt()'ed:
       // set all controllers to idle
-
-      temp.send(new WashingMessage(this, WashingMessage.TEMP_IDLE));
       water.send(new WashingMessage(this, WashingMessage.WATER_IDLE));
       spin.send(new WashingMessage(this, WashingMessage.SPIN_OFF));
+      temp.send(new WashingMessage(this, WashingMessage.TEMP_IDLE));
       System.out.println("washing program interrupted");
     }
   }
