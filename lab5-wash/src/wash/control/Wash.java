@@ -1,6 +1,7 @@
 package wash.control;
 
 import actor.ActorThread;
+import sun.misc.Unsafe;
 import wash.io.WashingIO;
 import wash.simulation.WashingSimulator;
 
@@ -15,6 +16,10 @@ public class Wash {
     WaterController water = new WaterController(io);
     SpinController spin = new SpinController(io);
 
+    temp.setName("Temp thread");
+    water.setName("Water thread");
+    spin.setName("Spin thread");
+
     temp.start();
     water.start();
     spin.start();
@@ -26,12 +31,15 @@ public class Wash {
 
       if (n == 1) {
         currentProgram = new WashingProgram1(io, temp, water, spin);
+        currentProgram.setName("Program thread");
         currentProgram.start();
       } else if (n == 2) {
         currentProgram = new WashingProgram2(io, temp, water, spin);
+        currentProgram.setName("Program thread");
         currentProgram.start();
       } else if (n == 3) {
         currentProgram = new WashingProgram3(io, temp, water, spin);
+        currentProgram.setName("Program thread");
         currentProgram.start();
       } else if (n == 0) {
         currentProgram.interrupt();

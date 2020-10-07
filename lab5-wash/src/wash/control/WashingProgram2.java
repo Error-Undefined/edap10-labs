@@ -118,10 +118,11 @@ public class WashingProgram2 extends ActorThread<WashingMessage> {
       }
 
       // Start centrifuge part
-      spin.send(new WashingMessage(this, WashingMessage.SPIN_FAST));
-      receive();
 
       water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
+      receive();
+
+      spin.send(new WashingMessage(this, WashingMessage.SPIN_FAST));
       receive();
 
       Thread.sleep(5 * 60000 / Settings.SPEEDUP);
@@ -130,7 +131,6 @@ public class WashingProgram2 extends ActorThread<WashingMessage> {
       receive();
 
       water.send(new WashingMessage(this, WashingMessage.WATER_IDLE));
-      receive();
 
       // Now that the barrel has stopped and the water is empty, it is safe to open
       // the hatch.

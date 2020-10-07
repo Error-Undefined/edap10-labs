@@ -103,7 +103,6 @@ public class WashingProgram1 extends ActorThread<WashingMessage> {
       receive();
 
       water.send(new WashingMessage(this, WashingMessage.WATER_IDLE));
-      receive();
 
       // Now that the barrel has stopped and the water is empty, it is safe to open
       // the hatch.

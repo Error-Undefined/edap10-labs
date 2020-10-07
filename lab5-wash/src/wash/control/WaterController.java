@@ -45,6 +45,7 @@ public class WaterController extends ActorThread<WashingMessage> {
             }
 
           } else if (currentMessage.getCommand() == WashingMessage.WATER_DRAIN) {
+            io.drain(true);
             if (io.getWaterLevel() == 0) {
               // io.drain(false);
               if (shouldReply) {
