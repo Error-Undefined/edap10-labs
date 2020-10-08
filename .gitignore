@@ -1,8 +1,5 @@
 bin/
 build/autogen
 .DS_Store
-*~
 solutions.zip
 *.c-student
-.project
-.vscode

@@ -1,0 +1,133 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - LiftMain",
+      "request": "launch",
+      "mainClass": "LiftMain",
+      "projectName": "3. Passenger lift"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch) - Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-ClockMain<1. Alarm clock>",
+      "request": "launch",
+      "mainClass": "ClockMain",
+      "projectName": "1. Alarm clock"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-LabToolController<2. Widgets from outer space>",
+      "request": "launch",
+      "mainClass": "factory.controller.LabToolController",
+      "projectName": "2. Widgets from outer space"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-MultipleTrainSimulation<2. Widgets from outer space>",
+      "request": "launch",
+      "mainClass": "train.simulation.MultipleTrainSimulation",
+      "projectName": "2. Widgets from outer space"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-OneTrainSimulation<2. Widgets from outer space>",
+      "request": "launch",
+      "mainClass": "train.simulation.OneTrainSimulation",
+      "projectName": "2. Widgets from outer space"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-SafeMultipleTrainSimulation<2. Widgets from outer space>",
+      "request": "launch",
+      "mainClass": "train.simulation.SafeMultipleTrainSimulation",
+      "projectName": "2. Widgets from outer space"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-TrainSimulation<2. Widgets from outer space>",
+      "request": "launch",
+      "mainClass": "train.simulation.TrainSimulation",
+      "projectName": "2. Widgets from outer space"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-OnePersonRidesLift<3. Passenger lift>",
+      "request": "launch",
+      "mainClass": "OnePersonRidesLift",
+      "projectName": "3. Passenger lift"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-CodeBreaker<4. Cracking the code>",
+      "request": "launch",
+      "mainClass": "CodeBreaker",
+      "projectName": "4. Cracking the code"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-CodeBreakingExample<4. Cracking the code>",
+      "request": "launch",
+      "mainClass": "CodeBreakingExample",
+      "projectName": "4. Cracking the code"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-ExampleBidirectional<5. Washing machine>",
+      "request": "launch",
+      "mainClass": "actor.test.ExampleBidirectional",
+      "projectName": "5. Washing machine"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-ExampleMessagingWithTimeout<5. Washing machine>",
+      "request": "launch",
+      "mainClass": "actor.test.ExampleMessagingWithTimeout",
+      "projectName": "5. Washing machine"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-ExampleProducerConsumer<5. Washing machine>",
+      "request": "launch",
+      "mainClass": "actor.test.ExampleProducerConsumer",
+      "projectName": "5. Washing machine"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-Wash<5. Washing machine>",
+      "request": "launch",
+      "mainClass": "wash.control.Wash",
+      "projectName": "5. Washing machine"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-Chat<6. Jim Hacker and the Twits>",
+      "request": "launch",
+      "mainClass": "Chat",
+      "projectName": "6. Jim Hacker and the Twits"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-ChatWithTwit<6. Jim Hacker and the Twits>",
+      "request": "launch",
+      "mainClass": "ChatWithTwit",
+      "projectName": "6. Jim Hacker and the Twits"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-RSA<cs>",
+      "request": "launch",
+      "mainClass": "rsa.impl.RSA",
+      "projectName": "cs"
+    }
+  ]
+}
