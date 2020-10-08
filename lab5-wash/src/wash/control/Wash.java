@@ -1,7 +1,6 @@
 package wash.control;
 
 import actor.ActorThread;
-import sun.misc.Unsafe;
 import wash.io.WashingIO;
 import wash.simulation.WashingSimulator;
 
