@@ -3,7 +3,6 @@ package train.threads;
 import train.model.Route;
 import train.model.Segment;
 import train.monitor.SegmentMonitor;
-import train.monitor.TamperedSegmentMonitor;
 import train.view.TrainView;
 
 import java.util.LinkedList;

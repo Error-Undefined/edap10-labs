@@ -2,7 +2,6 @@ package train.simulation;
 
 import train.view.TrainView;
 import train.monitor.SegmentMonitor;
-import train.monitor.TamperedSegmentMonitor;
 import train.threads.SafeRouteThread;
 
 public class SafeMultipleTrainSimulation {
